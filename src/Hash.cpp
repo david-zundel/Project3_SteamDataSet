@@ -47,6 +47,19 @@ Game* Hash::search(const std::string& name) {
     return nullptr;
 }
 
+std::vector<Game> Hash::searchByName(const std::string& term) const {
+    std::vector<Game> result;
+    for (auto const& chain : table) {
+        for (auto const& g : chain) {
+            if (g.getName().find(term) != std::string::npos) {
+                result.push_back(g);
+            }
+        }
+    }
+    return result;
+}
+
+
 void Hash::printTable() const {
     for (int i = 0; i < capacity; ++i) {
         if (!table[i].empty()) {

@@ -20,6 +20,7 @@ public:
     bool remove(const std::string& name);
     // Search by name
     Game* search(const std::string& name);
+    std::vector<Game> searchByName(const std::string& term) const;
 
     // Search by other fields
     std::vector<Game> searchByGenre(const std::string& genre) const;
