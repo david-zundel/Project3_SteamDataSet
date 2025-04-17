@@ -20,12 +20,14 @@ public:
     double getPrice() const;
     string getGenre() const;
     string getReleaseDate() const;
+    int getRequiredAge() const;
 
     // functions to set attributes
     void setName(const string& name);
     void setPrice(double price);
     void setGenre(const string& genre);
     void setReleaseDate(const string& release_date);
+    void setRequiredAge(int required_age);
 
  
     string toString() const;

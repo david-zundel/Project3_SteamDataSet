@@ -27,7 +27,12 @@ string Game::getGenre() const {
 string Game::getReleaseDate() const {
     return release_date;
 }
-
+int Game::getRequiredAge() const {
+    return required_age;
+}
+void Game::setRequiredAge(int required_age) {
+    this->required_age = required_age;
+}
 
 void Game::setName(const string& name) {
     this->name = name;
