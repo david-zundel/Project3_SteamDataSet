@@ -72,12 +72,29 @@ void parseDataset(string filePath) {
 
     file.close();
 }
+void displayMenu() {
+    cout << "Welcome to the Game Dataset Analyzer!" << endl;
+    cout << "--------------------------------------" << endl;
+    cout << "Choose an option:" << endl;
+    cout << "1. Search for a game by name or AppID" << endl;
+    cout << "2. Find the most expensive game" << endl;
+    cout << "3. Find the cheapest game" << endl;
+    cout << "4. Filter games by required age" << endl;
+    cout << "5. Filter games by estimated owners" << endl;
+    cout << "6. Sort games by price" << endl;
+    cout << "7. Sort games by release date" << endl;
+    cout << "8. Display dataset statistics" << endl;
+    cout << "9. Exit" << endl;
+    cout << "--------------------------------------" << endl;
+    cout << "Enter your choice: ";
+}
 
 int main() {
     string filePath = "dataset/games.csv";
 
     // parse the dataset
     parseDataset(filePath);
+    displayMenu();
 
     return 0;
 }
