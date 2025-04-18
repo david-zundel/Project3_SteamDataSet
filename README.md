@@ -10,9 +10,23 @@ This project is a terminal based application for analyzing a dataset of Steam ga
 
 ## Dataset
 The dataset used in this project is the Steam Game Dataset, which contains information about various games available on the Steam platform. The dataset includes details such as game name, App ID, price, release date, required age, estimated owners, and more.
-- The dataset is available at [Steam Game Dataset](https://www.kaggle.com/datasets/fronkongames/steam-games-dataset).
-- The dataset is in CSV format.
-- The CSV file ('games.csv') is located in the "dataset" directory
+
+### How to Obtain the Dataset
+1. Download the dataset from [Steam Game Dataset on Kaggle](https://www.kaggle.com/datasets/fronkongames/steam-games-dataset).
+2. Extract the dataset and locate the `games.csv` file.
+3. Place the `games.csv` file in the `dataset/` directory of the project.
+
+### Directory Structure
+After placing the dataset, your project directory should look like this: 
+Project3_SteamDataSet/
+├── dataset/
+│   └── games.csv
+├── src/
+│   ├── main.cpp
+│   ├── Game.cpp
+│   └── Game.h
+├── README.md
+
 
 ## How to run
 1. Clone the repository to your local machine. Link: https://github.com/david-zundel/Project3_SteamDataSet.git
