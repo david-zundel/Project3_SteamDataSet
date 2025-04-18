@@ -36,7 +36,7 @@ Project3_SteamDataSet/
 4. Run the program using the command: ./main
 5. Follow the on-screen instructions to interact with the application.
 
-Credits
+## Credits
 This project was developed by the following team members for the course COP3530 at the University of Florida:
 - David Zundel: [Github](https://github.com/david-zundel)
 - Zachary Fisher: [Github](https://github.com/ZachFisher8)
