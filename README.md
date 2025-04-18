@@ -13,6 +13,7 @@ The dataset used in this project is the Steam Game Dataset, which contains infor
 
 ### How to Obtain the Dataset
 1. Download the dataset from [Steam Game Dataset on Kaggle](https://www.kaggle.com/datasets/fronkongames/steam-games-dataset).
+2. Create a `dataset` directory in the root of the project: mkdir dataset
 2. Extract the dataset and locate the `games.csv` file.
 3. Place the `games.csv` file in the `dataset/` directory of the project.
 
