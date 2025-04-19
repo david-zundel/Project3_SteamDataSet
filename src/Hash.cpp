@@ -6,6 +6,7 @@
 #include <functional>
 #include <algorithm>
 #include <iostream>
+#include <cctype>
 
 Hash::Hash(int size)
     : capacity(size), table(size)
@@ -59,67 +60,6 @@ std::vector<Game> Hash::searchByName(const std::string& term) const {
     return result;
 }
 
-
-void Hash::printTable() const {
-    for (int i = 0; i < capacity; ++i) {
-        if (!table[i].empty()) {
-            std::cout << "Bucket " << i << ":\n";
-            for (auto const& g : table[i]) {
-                std::cout << "  " << g << "\n";
-            }
-        }
-    }
-}
-
-std::vector<Game> Hash::getAllGames() const {
-    std::vector<Game> result;
-    for (auto const& chain : table) {
-        for (auto const& g : chain) {
-            result.push_back(g);
-        }
-    }
-    return result;
-}
-
-std::vector<Game> Hash::sortByPriceAsc() const {
-    auto v = getAllGames();
-    std::sort(v.begin(), v.end(),
-        [](const Game& a, const Game& b) { return a.getPrice() < b.getPrice(); });
-    return v;
-}
-
-std::vector<Game> Hash::sortByPriceDesc() const {
-    auto v = getAllGames();
-    std::sort(v.begin(), v.end(),
-        [](const Game& a, const Game& b) { return a.getPrice() > b.getPrice(); });
-    return v;
-}
-
-std::vector<Game> Hash::sortByGenre() const {
-    auto v = getAllGames();
-    std::sort(v.begin(), v.end(),
-        [](const Game& a, const Game& b) {
-            if (a.getGenre() != b.getGenre())
-                return a.getGenre() < b.getGenre();
-            return a.getName() < b.getName();
-        });
-    return v;
-}
-
-std::vector<Game> Hash::sortByName() const {
-    auto v = getAllGames();
-    std::sort(v.begin(), v.end(),
-        [](const Game& a, const Game& b) { return a.getName() < b.getName(); });
-    return v;
-}
-
-std::vector<Game> Hash::sortByReleaseDate() const {
-    auto v = getAllGames();
-    std::sort(v.begin(), v.end(),
-        [](const Game& a, const Game& b) { return a.getReleaseDate() < b.getReleaseDate(); });
-    return v;
-}
-
 std::vector<Game> Hash::searchByGenre(const std::string& genre) const {
     std::vector<Game> result;
     for (auto const& chain : table) {
@@ -139,3 +79,48 @@ std::vector<Game> Hash::searchByReleaseDate(const std::string& date) const {
     }
     return result;
 }
+
+std::vector<Game> Hash::searchByRequiredAge(int maxAge) const {
+    std::vector<Game> result;
+    for (auto const& chain : table) {
+        for (auto const& g : chain) {
+            if (g.getRequiredAge() <= maxAge) result.push_back(g);
+        }
+    }
+    return result;
+}
+
+std::vector<Game> Hash::searchByEstimatedOwners(int minOwners) const {
+    std::vector<Game> result;
+    for (auto const& chain : table) {
+        for (auto const& g : chain) {
+            const std::string& s = g.getEstimatedOwners();
+            std::string num;
+            for (char c : s) {
+                if (std::isdigit(static_cast<unsigned char>(c))) num += c;
+                else if (!num.empty()) break;
+            }
+            if (!num.empty()) {
+                int val = std::stoi(num);
+                if (val >= minOwners) result.push_back(g);
+            }
+        }
+    }
+    return result;
+}
+
+void Hash::printTable() const {
+    for (int i = 0; i < capacity; ++i) {
+        if (!table[i].empty()) {
+            std::cout << "Bucket " << i << ":\n";
+            for (auto const& g : table[i]) std::cout << "  " << g << "\n";
+        }
+    }
+}
+
+std::vector<Game> Hash::getAllGames() const {
+    std::vector<Game> result;
+    for (auto const& chain : table) for (auto const& g : chain) result.push_back(g);
+    return result;
+}
+
