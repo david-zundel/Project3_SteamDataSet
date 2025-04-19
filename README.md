@@ -32,8 +32,8 @@ Project3_SteamDataSet/
 ## How to run
 1. Clone the repository to your local machine. Link: https://github.com/david-zundel/Project3_SteamDataSet.git
 2. Navigate to the project directory: cd Project3_SteamDataSet
-3. Compile the program using the command: g++ -o main src/main.cpp src/Game.cpp
-4. Run the program using the command: ./main
+3. Compile the program using the command: g++ -std=c++17 -o GameAnalyzer src/main.cpp src/Hash.cpp src/Game.cpp
+4. Run the program using the command: ./GameAnalyzer
 5. Follow the on-screen instructions to interact with the application.
 
 ## Credits

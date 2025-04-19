@@ -3,10 +3,15 @@
 #include <sstream>
 #include <string>
 #include "Game.h" 
+#include "Hash.h"
+#include <vector>
+#include <algorithm>
+#include <chrono>
+#include <iomanip>
 
 using namespace std;
 
-void parseDataset(string filePath) {
+void parseDataset(string filePath, Hash& hashTable) {
     ifstream file(filePath);
     if (!file.is_open()) {
         cout << "couldn't open file " << filePath << endl;
@@ -62,13 +67,12 @@ void parseDataset(string filePath) {
 
         // create a game object
         Game game(name, price, "", releaseDate, requiredAge, estimatedOwners);
-
-        // print the game object
+        hashTable.insert(game); // insert the game into the hash table
         numGames++;
         //cout << "AppID: " << appID << ", " << game << endl;
         
     }
-    cout << numGames << " games parsed." << endl;
+    cout << numGames << " games parsed." << endl << endl;
 
     file.close();
 }
@@ -76,25 +80,101 @@ void displayMenu() {
     cout << "Welcome to the Game Dataset Analyzer!" << endl;
     cout << "--------------------------------------" << endl;
     cout << "Choose an option:" << endl;
-    cout << "1. Search for a game by name or AppID" << endl;
+    cout << "1. Search for a game by name" << endl;
     cout << "2. Find the most expensive game" << endl;
-    cout << "3. Find the cheapest game" << endl;
-    cout << "4. Filter games by required age" << endl;
-    cout << "5. Filter games by estimated owners" << endl;
-    cout << "6. Sort games by price" << endl;
-    cout << "7. Sort games by release date" << endl;
-    cout << "8. Display dataset statistics" << endl;
-    cout << "9. Exit" << endl;
+    cout << "3. Filter games by required age" << endl;
+    cout << "4. Filter games by estimated owners" << endl;
+    cout << "5. Sort games by price" << endl;
+    cout << "6. Sort games by release date" << endl;
+    cout << "7. Display dataset statistics" << endl;
+    cout << "8. Exit" << endl;
     cout << "--------------------------------------" << endl;
-    cout << "Enter your choice: ";
+    cout << "\nEnter your choice: ";
 }
+void searchByName(Hash& hashTable) {
+    string name; 
+    cout << "\nEnter the name of the game: ";
+    getline(cin, name); // Read the full game name, including spaces
 
+    auto startHash = chrono::high_resolution_clock::now();
+    Game* gameHash = hashTable.search(name);
+    auto endHash = chrono::high_resolution_clock::now();
+    auto durationHash = chrono::duration_cast<chrono::microseconds>(endHash - startHash);
+
+    cout << "Hash Table Search Time: " << durationHash.count() << " microseconds" << endl;
+
+    if (gameHash != nullptr) {
+        cout << "Game found: " << endl;
+        cout << "Name: " << gameHash->getName() << endl;
+        cout << "Price: $" << gameHash->getPrice() << endl;
+        cout << "Release Date: " << gameHash->getReleaseDate() << endl;
+        cout << "Required Age: " << gameHash->getRequiredAge() << endl;
+        cout << "Estimated Owners: " << gameHash->getEstimatedOwners() << endl;
+    } else {
+        cout << "Game not found." << endl;
+    }
+
+    // Add a blank line for better formatting
+    cout << endl;
+}
+void findMostExpensiveGame(Hash& hashTable){
+    auto startHash = chrono::high_resolution_clock::now();
+    vector<Game> gamesHash = hashTable.sortByPriceDesc();
+    auto endHash = chrono::high_resolution_clock::now();
+    auto durationHash = chrono::duration_cast<chrono::microseconds>(endHash - startHash);
+    cout << "Hash Table Sort Time: " << durationHash.count() << " microseconds" << endl;
+    if (!gamesHash.empty()) {
+        cout << "Most Expensive Game: " << endl;
+        cout << "Name: " << gamesHash[0].getName() << endl;
+        cout << "Price: $" << gamesHash[0].getPrice() << endl;
+        cout << "Release Date: " << gamesHash[0].getReleaseDate() << endl;
+        cout << "Required Age: " << gamesHash[0].getRequiredAge() << endl;
+        cout << "Estimated Owners: " << gamesHash[0].getEstimatedOwners() << endl << endl;
+        
+    } else {
+        cout << "No games found." << endl;
+    }
+
+}
 int main() {
     string filePath = "dataset/games.csv";
+    Hash hashTable(100); // Initialize hash table with a size of 100
 
-    // parse the dataset
-    parseDataset(filePath);
-    displayMenu();
+    // Parse the dataset
+    parseDataset(filePath, hashTable);
+
+    while (true) {
+        displayMenu();
+        int choice;
+        cin >> choice;
+
+        // Clear the input buffer to avoid issues with getline
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        if (choice == 1) {
+            searchByName(hashTable);
+        } else if (choice == 2) {
+            findMostExpensiveGame(hashTable);
+        } else if (choice == 3) {
+            // Filter games by required age
+        } else if (choice == 4) {
+            // Filter games by estimated owners
+        } else if (choice == 5) {
+            // Sort games by price
+        } else if (choice == 6) {
+            // Sort games by release date
+        } else if (choice == 7) {
+            // Display dataset statistics
+        } else if (choice == 8) {
+            cout << "Exiting..." << endl;
+            break;
+        } else {
+            cout << "Invalid choice. Please try again." << endl;
+        }
+
+        // Add a blank line for better formatting
+        cout << endl;
+    }
 
     return 0;
 }
