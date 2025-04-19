@@ -136,6 +136,101 @@ void findMostExpensiveGame(Hash& hashTable){
     }
 
 }
+void filterByRequiredAge(Hash& hashTable) {
+    int maxAge;
+    cout << "Enter the maximum required age: ";
+    cin >> maxAge;
+
+    auto startHash = chrono::high_resolution_clock::now();
+    vector<Game> gamesHash = hashTable.searchByRequiredAge(maxAge);
+    auto endHash = chrono::high_resolution_clock::now();
+    auto durationHash = chrono::duration_cast<chrono::microseconds>(endHash - startHash);
+    cout << "Hash Table Filter Time: " << durationHash.count() << " microseconds" << endl;
+
+    if (!gamesHash.empty()) {
+        cout << "Games suitable for age " << maxAge << " or older:\n" << endl;
+        for (const auto& game : gamesHash) {
+            cout << "Name: " << game.getName() << ", Required Age: " << game.getRequiredAge() << endl;
+        }
+    } else {
+        cout << "No games found for the specified age." << endl;
+    }
+}
+void filterByEstimatedOwners(Hash& hashTable) {
+    int minOwners;
+    cout << "\nEnter the minimum estimated owners: ";
+    cin >> minOwners;
+
+    auto startHash = chrono::high_resolution_clock::now();
+    vector<Game> filteredGames = hashTable.searchByEstimatedOwners(minOwners);
+    auto endHash = chrono::high_resolution_clock::now();
+    auto durationHash = chrono::duration_cast<chrono::microseconds>(endHash - startHash);
+
+    cout << "\nHash Table Filter Time: " << durationHash.count() << " microseconds\n" << endl;
+
+    if (!filteredGames.empty()) {
+        cout << "Games with at least " << minOwners << " estimated owners:\n" << endl;
+        for (const auto& game : filteredGames) {
+            cout << "Name: " << game.getName() << ", Estimated Owners: " << game.getEstimatedOwners() << endl;
+        }
+    } else {
+        cout << "No games found for the specified estimated owners." << endl;
+    }
+}
+void sortGamesByPrice(Hash& hashTable) {
+    auto startHash = chrono::high_resolution_clock::now();
+    vector<Game> sortedGames = hashTable.sortByPriceAsc();
+    auto endHash = chrono::high_resolution_clock::now();
+    auto durationHash = chrono::duration_cast<chrono::microseconds>(endHash - startHash);
+
+    cout << "\nHash Table Sort Time: " << durationHash.count() << " microseconds\n" << endl;
+
+    if (!sortedGames.empty()) {
+        cout << "Games sorted by price (ascending):\n" << endl;
+
+        // Calculate step size to evenly distribute 100 games
+        int step = max(1, static_cast<int>(sortedGames.size() / 100));
+        int count = 0;
+
+        for (size_t i = 0; i < sortedGames.size() && count < 100; i += step) {
+            cout << "Name: " << sortedGames[i].getName() << ", Price: $" << sortedGames[i].getPrice() << endl;
+            count++;
+        }
+    } else {
+        cout << "No games available to sort." << endl;
+    }
+}
+void sortGamesByReleaseDate(Hash& hashTable) {
+    auto startHash = chrono::high_resolution_clock::now();
+    vector<Game> sortedGames = hashTable.sortByReleaseDate();
+    auto endHash = chrono::high_resolution_clock::now();
+    auto durationHash = chrono::duration_cast<chrono::microseconds>(endHash - startHash);
+
+    cout << "\nHash Table Sort Time: " << durationHash.count() << " microseconds\n" << endl;
+
+    if (!sortedGames.empty()) {
+        cout << "Games sorted by release date (newest to oldest):\n" << endl;
+
+        // Calculate step size to evenly distribute 100 games
+        int step = max(1, static_cast<int>(sortedGames.size() / 100));
+        int count = 0;
+
+        for (size_t i = 0; i < sortedGames.size() && count < 100; i += step) {
+            cout << "Name: " << sortedGames[i].getName() << ", Release Date: " << sortedGames[i].getReleaseDate() <<  "," << i/step << endl;
+            count++;
+        }
+    } else {
+        cout << "No games available to sort." << endl;
+    }
+}
+void displayDatasetStatistics(Hash& hashTable) {
+    auto startHash = chrono::high_resolution_clock::now();
+    hashTable.printTable();
+    auto endHash = chrono::high_resolution_clock::now();
+    auto durationHash = chrono::duration_cast<chrono::microseconds>(endHash - startHash);
+
+    std::cout << "\nHash Table Statistics Display Time: " << durationHash.count() << " microseconds\n" << std::endl;
+}
 int main() {
     string filePath = "dataset/games.csv";
     Hash hashTable(100); // Initialize hash table with a size of 100
@@ -156,15 +251,15 @@ int main() {
         } else if (choice == 2) {
             findMostExpensiveGame(hashTable);
         } else if (choice == 3) {
-            // Filter games by required age
+            filterByRequiredAge(hashTable);
         } else if (choice == 4) {
-            // Filter games by estimated owners
+            filterByEstimatedOwners(hashTable);
         } else if (choice == 5) {
-            // Sort games by price
+            sortGamesByPrice(hashTable);
         } else if (choice == 6) {
-            // Sort games by release date
+            sortGamesByReleaseDate(hashTable);
         } else if (choice == 7) {
-            // Display dataset statistics
+            displayDatasetStatistics(hashTable);
         } else if (choice == 8) {
             cout << "Exiting..." << endl;
             break;
