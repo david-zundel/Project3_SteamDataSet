@@ -4,7 +4,6 @@
 #ifndef HASH_H
 #define HASH_H
 
-
 #include <vector>
 #include <list>
 #include <string>
@@ -18,13 +17,18 @@ public:
     void insert(const Game& game);
     // Remove by name
     bool remove(const std::string& name);
-    // Search by name
+    // Exact search by name
     Game* search(const std::string& name);
+    // Substring search by name
     std::vector<Game> searchByName(const std::string& term) const;
 
     // Search by other fields
     std::vector<Game> searchByGenre(const std::string& genre) const;
     std::vector<Game> searchByReleaseDate(const std::string& date) const;
+    // Required age filter (maximum threshold: returns games with requiredAge <= maxAge)
+    std::vector<Game> searchByRequiredAge(int maxAge) const;
+    // Estimated owners filter (minimum threshold: returns games with owners >= minOwners)
+    std::vector<Game> searchByEstimatedOwners(int minOwners) const;
 
     // Sorting
     std::vector<Game> sortByPriceAsc() const;
@@ -46,4 +50,4 @@ private:
     std::vector<std::list<Game>> table;
 };
 
-#endif //HASH_H
+#endif
