@@ -11,24 +11,46 @@
 #include <vector>
 #include <string>
 #include <map>
-
+using namespace std;
 Hash::Hash(int size)
-    : capacity(size), table(size)
+    : capacity(size), table(size), totalGames(0)
 {}
 
 size_t Hash::hashFunction(const std::string& key) const {
     return std::hash<std::string>{}(key) % capacity;
 }
+void Hash::resize() {
+    int newCapacity = capacity * 2; //double the number of buckets
+    std::vector<std::list<Game>> newTable(newCapacity);
 
+    //rehash all elements into the new table
+    for (const auto& chain : table) {
+        for (const auto& game : chain) {
+            size_t newHash = std::hash<std::string>{}(game.getName()) % newCapacity;
+            newTable[newHash].push_back(game);
+        }
+    }
+
+    //replace the old table with the new one
+    table = std::move(newTable);
+    capacity = newCapacity;
+}
 void Hash::insert(const Game& game) {
     auto& chain = table[hashFunction(game.getName())];
     for (auto& g : chain) {
         if (g.getName() == game.getName()) {
-            g = game;
+            g = game; //update the existing game
             return;
         }
     }
     chain.push_back(game);
+    totalGames++; //increment the total number of games
+
+    //check the load factor and resize if necessary
+    double loadFactor = static_cast<double>(totalGames) / capacity;
+    if (loadFactor > 1.0) { //resize when load factor exceeds 1.0
+        resize();
+    }
 }
 
 bool Hash::remove(const std::string& name) {
@@ -36,6 +58,7 @@ bool Hash::remove(const std::string& name) {
     for (auto it = chain.begin(); it != chain.end(); ++it) {
         if (it->getName() == name) {
             chain.erase(it);
+            totalGames--; //decrement the total number of games
             return true;
         }
     }

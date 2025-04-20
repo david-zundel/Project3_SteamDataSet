@@ -21,6 +21,7 @@ public:
     Game* search(const std::string& name);
     // Substring search by name
     std::vector<Game> searchByName(const std::string& term) const;
+    void resize(); 
 
     // Search by other fields
     std::vector<Game> searchByGenre(const std::string& genre) const;
@@ -42,6 +43,7 @@ public:
 
 private:
     // Helper to gather all games
+    int totalGames;
     std::vector<Game> getAllGames() const;
     // Hash function
     size_t hashFunction(const std::string& key) const;
