@@ -21,6 +21,7 @@ void parseDataset(string filePath, Hash& hashTable) {
     string line, header;
     getline(file, header); //header line
     int numGames = 0;
+    long long totalInsertionTime = 0;
     while (getline(file, line)) {
         stringstream ss(line);
         string appID, name, releaseDate, estimatedOwners, peakCCU, requiredAgeStr, priceStr;
@@ -67,13 +68,19 @@ void parseDataset(string filePath, Hash& hashTable) {
 
         // create a game object
         Game game(name, price, "", releaseDate, requiredAge, estimatedOwners);
+
+        auto startInsert = chrono::high_resolution_clock::now();
         hashTable.insert(game); // insert the game into the hash table
+        auto endInsert = chrono::high_resolution_clock::now();
+        totalInsertionTime += chrono::duration_cast<chrono::microseconds>(endInsert - startInsert).count();
+
         numGames++;
         //cout << "AppID: " << appID << ", " << game << endl;
         
     }
     cout << numGames << " games parsed." << endl << endl;
-
+    cout << "Total Hash Table Insertion Time: " << totalInsertionTime << " microseconds (" 
+    << totalInsertionTime / 1000.0 << " milliseconds)" << endl;
     file.close();
 }
 void displayMenu() {
@@ -233,7 +240,7 @@ void displayDatasetStatistics(Hash& hashTable) {
 }
 int main() {
     string filePath = "dataset/games.csv";
-    Hash hashTable(100); // Initialize hash table with a size of 100
+    Hash hashTable(50000); // Initialize hash table with a size of 50000
 
     // Parse the dataset
     parseDataset(filePath, hashTable);
