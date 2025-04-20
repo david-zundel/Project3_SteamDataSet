@@ -5,13 +5,14 @@ using namespace std;
 
 //constructor
 Game::Game(const string& name, double price, const string& genre, const string& release_date, 
-           int required_age, const string& estimated_owners) {
+           int required_age, const string& estimated_owners, const string& appID) {
     this->name = name;
     this->price = price;
     this->genre = genre;
     this->release_date = release_date;
     this->required_age = required_age;
     this->estimated_owners = estimated_owners;
+    this->appID = appID;
 }
 
 // getters
@@ -37,6 +38,10 @@ int Game::getRequiredAge() const {
 
 string Game::getEstimatedOwners() const {
     return estimated_owners;
+}
+
+string Game::getAppID() const {
+    return appID;
 }
 
 // Setters

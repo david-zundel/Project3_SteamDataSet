@@ -4,6 +4,7 @@
 #include <string>
 #include "Game.h" 
 #include "Hash.h"
+#include "rb.cpp"
 #include <vector>
 #include <algorithm>
 #include <chrono>
@@ -11,7 +12,7 @@
 
 using namespace std;
 
-void parseDataset(string filePath, Hash& hashTable) {
+void parseDataset(string filePath, Hash& hashTable, rb& rbTree) {
     ifstream file(filePath);
     if (!file.is_open()) {
         cout << "couldn't open file " << filePath << endl;
@@ -66,8 +67,9 @@ void parseDataset(string filePath, Hash& hashTable) {
         }
 
         // create a game object
-        Game game(name, price, "", releaseDate, requiredAge, estimatedOwners);
+        Game game(name, price, "", releaseDate, requiredAge, estimatedOwners, appID);
         hashTable.insert(game); // insert the game into the hash table
+        rbTree.insert(game); // insert the game into the hash table
         numGames++;
         //cout << "AppID: " << appID << ", " << game << endl;
         
@@ -91,9 +93,20 @@ void displayMenu() {
     cout << "--------------------------------------" << endl;
     cout << "\nEnter your choice: ";
 }
+// Gives user choice of the type of data structure they want to use
+void tableChoice() {
+    cout << "Choose the type of data structure that you want to use:" << endl;
+    cout << "--------------------------------------" << endl;
+    cout << "1. Hash Table" << endl;
+    cout << "2. Red-Black Tree" << endl;
+    cout << "3. Go Back" << endl;
+    cout << "--------------------------------------" << endl;
+    cout << "\nEnter your choice: ";
+}
 void searchByName(Hash& hashTable) {
     string name; 
     cout << "\nEnter the name of the game: ";
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     getline(cin, name); // Read the full game name, including spaces
 
     auto startHash = chrono::high_resolution_clock::now();
@@ -231,12 +244,154 @@ void displayDatasetStatistics(Hash& hashTable) {
 
     std::cout << "\nHash Table Statistics Display Time: " << durationHash.count() << " microseconds\n" << std::endl;
 }
+void rbSearchByName(rb& rbTree) {
+    string name; 
+    cout << "\nEnter the name of the game: ";
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    getline(cin, name); // Read the full game name, including spaces
+
+    auto startRB = chrono::high_resolution_clock::now();
+    Game* gameRB = rbTree.rbSearchByName(rbTree, name);
+    auto endRB = chrono::high_resolution_clock::now();
+    auto durationRB = chrono::duration_cast<chrono::microseconds>(endRB - startRB);
+
+    cout << "Red Black Tree Search Time: " << durationRB.count() << " microseconds" << endl;
+
+    if (gameRB != nullptr) {
+        cout << "Game found: " << endl;
+        cout << "Name: " << gameRB->getName() << endl;
+        cout << "Price: $" << gameRB->getPrice() << endl;
+        cout << "Release Date: " << gameRB->getReleaseDate() << endl;
+        cout << "Required Age: " << gameRB->getRequiredAge() << endl;
+        cout << "Estimated Owners: " << gameRB->getEstimatedOwners() << endl;
+    } else {
+        cout << "Game not found." << endl;
+    }
+
+    // Add a blank line for better formatting
+    cout << endl;
+}
+void rbFindMostExpensiveGame(rb& rbTree){
+    auto startRB = chrono::high_resolution_clock::now();
+    vector<Game> gamesRB = rbTree.rbSortByPriceDesc(rbTree);
+    auto endRB = chrono::high_resolution_clock::now();
+    auto durationRB = chrono::duration_cast<chrono::microseconds>(endRB - startRB);
+    cout << "Red Black Tree Sort Time: " << durationRB.count() << " microseconds" << endl;
+    if (!gamesRB.empty()) {
+        cout << "Most Expensive Game: " << endl;
+        cout << "Name: " << gamesRB[0].getName() << endl;
+        cout << "Price: $" << gamesRB[0].getPrice() << endl;
+        cout << "Release Date: " << gamesRB[0].getReleaseDate() << endl;
+        cout << "Required Age: " << gamesRB[0].getRequiredAge() << endl;
+        cout << "Estimated Owners: " << gamesRB[0].getEstimatedOwners() << endl << endl;
+        
+    } else {
+        cout << "No games found." << endl;
+    }
+
+}
+void rbFilterByRequiredAge(rb& rbTree) {
+    int maxAge;
+    cout << "Enter the maximum required age: ";
+    cin >> maxAge;
+
+    auto startRB = chrono::high_resolution_clock::now();
+    vector<Game> gamesRB = rbTree.rbSearchByRequiredAge(rbTree, maxAge);
+    auto endRB = chrono::high_resolution_clock::now();
+    auto durationRB = chrono::duration_cast<chrono::microseconds>(endRB - startRB);
+    cout << "Red Black Tree Filter Time: " << durationRB.count() << " microseconds" << endl;
+
+    if (!gamesRB.empty()) {
+        cout << "Games suitable for age " << maxAge << " or older:\n" << endl;
+        for (const auto& game : gamesRB) {
+            cout << "Name: " << game.getName() << ", Required Age: " << game.getRequiredAge() << endl;
+        }
+    } else {
+        cout << "No games found for the specified age." << endl;
+    }
+}
+void rbFilterByEstimatedOwners(rb& rbTree) {
+    string minOwners;
+    cout << "\nEnter the minimum estimated owners: ";
+    cin >> minOwners;
+
+    auto startRB = chrono::high_resolution_clock::now();
+    vector<Game> filteredGames = rbTree.rbSearchByEstimatedOwners(rbTree, minOwners);
+    auto endRB = chrono::high_resolution_clock::now();
+    auto durationRB = chrono::duration_cast<chrono::microseconds>(endRB - startRB);
+
+    cout << "\nRed Black Tree Filter Time: " << durationRB.count() << " microseconds\n" << endl;
+
+    if (!filteredGames.empty()) {
+        cout << "Games with at least " << minOwners << " estimated owners:\n" << endl;
+        for (const auto& game : filteredGames) {
+            cout << "Name: " << game.getName() << ", Estimated Owners: " << game.getEstimatedOwners() << endl;
+        }
+    } else {
+        cout << "No games found for the specified estimated owners." << endl;
+    }
+}
+void rbSortGamesByPrice(rb& rbTree) {
+    auto startRB = chrono::high_resolution_clock::now();
+    vector<Game> sortedGames = rbTree.rbSortByPriceAsc(rbTree);
+    auto endRB = chrono::high_resolution_clock::now();
+    auto durationHash = chrono::duration_cast<chrono::microseconds>(endRB - startRB);
+
+    cout << "\nRed Black Tree Sort Time: " << durationHash.count() << " microseconds\n" << endl;
+
+    if (!sortedGames.empty()) {
+        cout << "Games sorted by price (ascending):\n" << endl;
+
+        // Calculate step size to evenly distribute 100 games
+        int step = max(1, static_cast<int>(sortedGames.size() / 100));
+        int count = 0;
+
+        for (size_t i = 0; i < sortedGames.size() && count < 100; i += step) {
+            cout << "Name: " << sortedGames[i].getName() << ", Price: $" << sortedGames[i].getPrice() << endl;
+            count++;
+        }
+    } else {
+        cout << "No games available to sort." << endl;
+    }
+}
+void rbSortGamesByReleaseDate(rb& rbTree) {
+    auto startRB = chrono::high_resolution_clock::now();
+    vector<Game> sortedGames = rbTree.rbSortByReleaseDate(rbTree);
+    auto endRB = chrono::high_resolution_clock::now();
+    auto durationRB = chrono::duration_cast<chrono::microseconds>(endRB - startRB);
+
+    cout << "\nRed Black Tree Sort Time: " << durationRB.count() << " microseconds\n" << endl;
+
+    if (!sortedGames.empty()) {
+        cout << "Games sorted by release date (newest to oldest):\n" << endl;
+
+        // Calculate step size to evenly distribute 100 games
+        int step = max(1, static_cast<int>(sortedGames.size() / 100));
+        int count = 0;
+
+        for (size_t i = 0; i < sortedGames.size() && count < 100; i += step) {
+            cout << "Name: " << sortedGames[i].getName() << ", Release Date: " << sortedGames[i].getReleaseDate() <<  "," << i/step << endl;
+            count++;
+        }
+    } else {
+        cout << "No games available to sort." << endl;
+    }
+}
+void rbDisplayDatasetStatistics(rb& rbTree) {
+    auto startRB = chrono::high_resolution_clock::now();
+    rbTree.printTable();
+    auto endRB = chrono::high_resolution_clock::now();
+    auto durationRB = chrono::duration_cast<chrono::microseconds>(endRB - startRB);
+
+    cout << "\nRed Black Tree Statistics Display Time: " << durationRB.count() << " microseconds\n" << endl;
+}
 int main() {
     string filePath = "dataset/games.csv";
     Hash hashTable(100); // Initialize hash table with a size of 100
+    rb rbTree; // Initializes rbTree
 
     // Parse the dataset
-    parseDataset(filePath, hashTable);
+    parseDataset(filePath, hashTable, rbTree);
 
     while (true) {
         displayMenu();
@@ -247,19 +402,131 @@ int main() {
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
         if (choice == 1) {
-            searchByName(hashTable);
+            tableChoice();
+            int tChoice;
+            cin >> tChoice;
+            if (tChoice == 1) {
+                searchByName(hashTable);
+            }
+            else if (tChoice == 2)
+            {
+                rbSearchByName(rbTree);
+            }
+            else if (tChoice == 3)
+            {
+                cout << "Exiting..." << endl;
+            }
+            else {
+                cout << "Invalid choice. Please try again." << endl;
+            }
         } else if (choice == 2) {
-            findMostExpensiveGame(hashTable);
+             tableChoice();
+            int tChoice;
+            cin >> tChoice;
+            if (tChoice == 1) {
+                findMostExpensiveGame(hashTable);
+            }
+            else if (tChoice == 2)
+            {
+                rbFindMostExpensiveGame(rbTree);
+            }
+            else if (tChoice == 3)
+            {
+                cout << "Exiting..." << endl;
+            }
+            else {
+                cout << "Invalid choice. Please try again." << endl;
+            }
         } else if (choice == 3) {
-            filterByRequiredAge(hashTable);
+            tableChoice();
+            int tChoice;
+            cin >> tChoice;
+            if (tChoice == 1) {
+                filterByRequiredAge(hashTable);
+            }
+            else if (tChoice == 2)
+            {
+                rbFilterByRequiredAge(rbTree);
+            }
+            else if (tChoice == 3)
+            {
+                cout << "Exiting..." << endl;
+            }
+            else {
+                cout << "Invalid choice. Please try again." << endl;
+            }
         } else if (choice == 4) {
-            filterByEstimatedOwners(hashTable);
+                         tableChoice();
+            int tChoice;
+            cin >> tChoice;
+            if (tChoice == 1) {
+                filterByEstimatedOwners(hashTable);
+            }
+            else if (tChoice == 2)
+            {
+                rbFilterByEstimatedOwners(rbTree);
+            }
+            else if (tChoice == 3)
+            {
+                cout << "Exiting..." << endl;
+            }
+            else {
+                cout << "Invalid choice. Please try again." << endl;
+            }
         } else if (choice == 5) {
-            sortGamesByPrice(hashTable);
+            tableChoice();
+            int tChoice;
+            cin >> tChoice;
+            if (tChoice == 1) {
+                findMostExpensiveGame(hashTable);
+            }
+            else if (tChoice == 2)
+            {
+                rbFindMostExpensiveGame(rbTree);
+            }
+            else if (tChoice == 3)
+            {
+                cout << "Exiting..." << endl;
+            }
+            else {
+                cout << "Invalid choice. Please try again." << endl;
+            }
         } else if (choice == 6) {
-            sortGamesByReleaseDate(hashTable);
+            tableChoice();
+            int tChoice;
+            cin >> tChoice;
+            if (tChoice == 1) {
+                sortGamesByReleaseDate(hashTable);
+            }
+            else if (tChoice == 2)
+            {
+                rbSortGamesByReleaseDate(rbTree);
+            }
+            else if (tChoice == 3)
+            {
+                cout << "Exiting..." << endl;
+            }
+            else {
+                cout << "Invalid choice. Please try again." << endl;
+            }
         } else if (choice == 7) {
-            displayDatasetStatistics(hashTable);
+            tableChoice();
+            int tChoice;
+            cin >> tChoice;
+            if (tChoice == 1) {
+                displayDatasetStatistics(hashTable);
+            }
+            else if (tChoice == 2)
+            {
+                rbDisplayDatasetStatistics(rbTree);
+            }
+            else if (tChoice == 3)
+            {
+                cout << "Exiting..." << endl;
+            }
+            else {
+                cout << "Invalid choice. Please try again." << endl;
+            }
         } else if (choice == 8) {
             cout << "Exiting..." << endl;
             break;

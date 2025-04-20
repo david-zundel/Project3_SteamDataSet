@@ -12,11 +12,12 @@ private:
     string release_date;
     int required_age;
     string estimated_owners;
+    string appID;
 
 public:
     // Constructor
     Game(const string& name = "", double price = 0.0, const string& genre = "", const string& release_date = "", 
-        int required_age = 0, const string& estimated_owners = "");
+        int required_age = 0, const string& estimated_owners = "", const string& appID = "");
 
 
     // functions to get attributes
@@ -26,6 +27,7 @@ public:
     string getReleaseDate() const;
     int getRequiredAge() const;
     string getEstimatedOwners() const;
+    string getAppID() const;
 
     // functions to set attributes
     void setName(const string& name);
