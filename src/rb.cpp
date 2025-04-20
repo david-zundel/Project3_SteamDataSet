@@ -208,7 +208,7 @@ vector<Game> rb::rbSearchByRequiredAge(rb& tree, int maxAge) const {
     vector<Game> result;
     auto gameList = tree.rbGetAllGames();
     for (const auto& g : gameList) {
-        if (g.getRequiredAge() >= maxAge) {
+        if (g.getRequiredAge() <= maxAge) { 
             result.push_back(g);
         }
     }

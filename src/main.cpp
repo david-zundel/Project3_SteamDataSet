@@ -23,6 +23,7 @@ void parseDataset(string filePath, Hash& hashTable, rb& rbTree) {
     getline(file, header); //header line
     int numGames = 0;
     long long totalInsertionTime = 0;
+    long long totalInsertionTimeRB = 0;
     while (getline(file, line)) {
         stringstream ss(line);
         string appID, name, releaseDate, estimatedOwners, peakCCU, requiredAgeStr, priceStr;
@@ -72,9 +73,13 @@ void parseDataset(string filePath, Hash& hashTable, rb& rbTree) {
 
         auto startInsert = chrono::high_resolution_clock::now();
         hashTable.insert(game); // insert the game into the hash table
-        rbTree.insert(game); // insert the game into the hash table
         auto endInsert = chrono::high_resolution_clock::now();
         totalInsertionTime += chrono::duration_cast<chrono::microseconds>(endInsert - startInsert).count();
+
+        auto startRB = chrono::high_resolution_clock::now();
+        rbTree.insert(game);
+        auto endRB = chrono::high_resolution_clock::now();
+        totalInsertionTimeRB += chrono::duration_cast<chrono::microseconds>(endRB - startRB).count();
 
         numGames++;
         //cout << "AppID: " << appID << ", " << game << endl;
@@ -83,6 +88,8 @@ void parseDataset(string filePath, Hash& hashTable, rb& rbTree) {
     cout << numGames << " games parsed." << endl << endl;
     cout << "Total Hash Table Insertion Time: " << totalInsertionTime << " microseconds (" 
     << totalInsertionTime / 1000.0 << " milliseconds)" << endl;
+      cout << "Total Red-Black Tree Insertion Time: " << totalInsertionTimeRB << " microseconds (" 
+         << totalInsertionTimeRB / 1000.0 << " milliseconds)" << endl;
     file.close();
 }
 void displayMenu() {
@@ -157,6 +164,7 @@ void findMostExpensiveGame(Hash& hashTable){
 
 }
 void filterByRequiredAge(Hash& hashTable) {
+    int limit = 100;
     int maxAge;
     cout << "Enter the maximum required age: ";
     cin >> maxAge;
@@ -168,9 +176,11 @@ void filterByRequiredAge(Hash& hashTable) {
     cout << "Hash Table Filter Time: " << durationHash.count() << " microseconds" << endl;
 
     if (!gamesHash.empty()) {
-        cout << "Games suitable for age " << maxAge << " or older:\n" << endl;
-        for (const auto& game : gamesHash) {
-            cout << "Name: " << game.getName() << ", Required Age: " << game.getRequiredAge() << endl;
+        cout << "Games suitable for age " << maxAge << " or older (showing up to " << limit << " results):\n" << endl;
+
+        //limit the number of displayed results to the specified limit
+        for (size_t i = 0; i < gamesHash.size() && i < static_cast<size_t>(limit); ++i) {
+            cout << "Name: " << gamesHash[i].getName() << ", Required Age: " << gamesHash[i].getRequiredAge() << endl;
         }
     } else {
         cout << "No games found for the specified age." << endl;
@@ -208,7 +218,7 @@ void sortGamesByPrice(Hash& hashTable) {
     if (!sortedGames.empty()) {
         cout << "Games sorted by price (ascending):\n" << endl;
 
-        // Calculate step size to evenly distribute 100 games
+        //calculate step size to evenly distribute 100 games
         int step = max(1, static_cast<int>(sortedGames.size() / 100));
         int count = 0;
 
@@ -231,7 +241,7 @@ void sortGamesByReleaseDate(Hash& hashTable) {
     if (!sortedGames.empty()) {
         cout << "Games sorted by release date (newest to oldest):\n" << endl;
 
-        // Calculate step size to evenly distribute 100 games
+        //calculate step size to evenly distribute 100 games
         int step = max(1, static_cast<int>(sortedGames.size() / 100));
         int count = 0;
 
@@ -309,9 +319,11 @@ void rbFilterByRequiredAge(rb& rbTree) {
     cout << "Red Black Tree Filter Time: " << durationRB.count() << " microseconds" << endl;
 
     if (!gamesRB.empty()) {
-        cout << "Games suitable for age " << maxAge << " or older:\n" << endl;
-        for (const auto& game : gamesRB) {
-            cout << "Name: " << game.getName() << ", Required Age: " << game.getRequiredAge() << endl;
+        cout << "Games suitable for age " << maxAge << " or older (showing up to 100 results):\n" << endl;
+
+        //limit the number of displayed results to 100
+        for (size_t i = 0; i < gamesRB.size() && i < 100; ++i) {
+            cout << "Name: " << gamesRB[i].getName() << ", Required Age: " << gamesRB[i].getRequiredAge() << endl;
         }
     } else {
         cout << "No games found for the specified age." << endl;
@@ -349,7 +361,7 @@ void rbSortGamesByPrice(rb& rbTree) {
     if (!sortedGames.empty()) {
         cout << "Games sorted by price (ascending):\n" << endl;
 
-        // Calculate step size to evenly distribute 100 games
+        //calculate step size to evenly distribute 100 games
         int step = max(1, static_cast<int>(sortedGames.size() / 100));
         int count = 0;
 
@@ -372,7 +384,7 @@ void rbSortGamesByReleaseDate(rb& rbTree) {
     if (!sortedGames.empty()) {
         cout << "Games sorted by release date (newest to oldest):\n" << endl;
 
-        // Calculate step size to evenly distribute 100 games
+        //calculate step size to evenly distribute 100 games
         int step = max(1, static_cast<int>(sortedGames.size() / 100));
         int count = 0;
 
@@ -394,10 +406,10 @@ void rbDisplayDatasetStatistics(rb& rbTree) {
 }
 int main() {
     string filePath = "dataset/games.csv";
-    Hash hashTable(50000); // Initialize hash table with a size of 50000
-    rb rbTree; // Initializes rbTree
+    Hash hashTable(50000); //nitialize hash table with a size of 50000
+    rb rbTree; //ionitializes rbTree
 
-    // Parse the dataset
+    //parse the dataset
     parseDataset(filePath, hashTable, rbTree);
 
     while (true) {
@@ -405,7 +417,7 @@ int main() {
         int choice;
         cin >> choice;
 
-        // Clear the input buffer to avoid issues with getline
+        //clear the input buffer to avoid issues with getline
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
         if (choice == 1) {
@@ -485,11 +497,11 @@ int main() {
             int tChoice;
             cin >> tChoice;
             if (tChoice == 1) {
-                findMostExpensiveGame(hashTable);
+                sortGamesByPrice(hashTable);
             }
             else if (tChoice == 2)
             {
-                rbFindMostExpensiveGame(rbTree);
+                rbSortGamesByPrice(rbTree);
             }
             else if (tChoice == 3)
             {
@@ -541,7 +553,7 @@ int main() {
             cout << "Invalid choice. Please try again." << endl;
         }
 
-        // Add a blank line for better formatting
+        //added a blank line for better formatting
         cout << endl;
     }
 

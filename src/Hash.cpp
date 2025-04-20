@@ -148,7 +148,7 @@ void Hash::printTable() const {
             totalGames += bucketSize;
             largestBucketSize = max(largestBucketSize, bucketSize);
 
-            // Print the contents of the bucket
+            //print the contents of the bucket
             // std::cout << "Bucket " << i << " (" << bucketSize << " items):\n";
             // for (auto const& g : table[i]) {
             //     std::cout << "  - " << g.getName() << "\n";
@@ -156,7 +156,7 @@ void Hash::printTable() const {
         }
     }
 
-    // Print summary statistics
+    //print summary statistics
     std::cout << "\n--- Dataset Statistics ---\n";
     std::cout << "Total games: " << totalGames << "\n";
     std::cout << "Total buckets: " << capacity << "\n";
@@ -188,31 +188,31 @@ vector<Game> Hash::sortByPriceDesc() const {
 vector<Game> Hash::sortByReleaseDate() const {
     vector<Game> allGames = getAllGames();
 
-    // Map month names to numeric values
+    //map month names to numeric values
     map<string, int> monthMap = {
         {"Jan", 1}, {"Feb", 2}, {"Mar", 3}, {"Apr", 4}, {"May", 5}, {"Jun", 6},
         {"Jul", 7}, {"Aug", 8}, {"Sep", 9}, {"Oct", 10}, {"Nov", 11}, {"Dec", 12}
     };
 
-    // Sort the games by release date
+    //sort the games by release date
     sort(allGames.begin(), allGames.end(), [&monthMap](const Game& a, const Game& b) {
         const string& date1 = a.getReleaseDate();
         const string& date2 = b.getReleaseDate();
 
-        // Parse year, month, and day from date1
+        //parse year month and day from date1
         int year1 = 0, month1 = 0, day1 = 0;
         int year2 = 0, month2 = 0, day2 = 0;
 
         try {
             // Split date1 into components
-            string monthStr1 = date1.substr(0, 3); // First 3 characters are the month
-            day1 = stoi(date1.substr(4, date1.find(',') - 4)); // Extract day
-            year1 = stoi(date1.substr(date1.find(',') + 2));   // Extract year
-            month1 = monthMap[monthStr1]; // Convert month name to numeric value
+            string monthStr1 = date1.substr(0, 3); //first 3 characters are the month
+            day1 = stoi(date1.substr(4, date1.find(',') - 4)); //extract day
+            year1 = stoi(date1.substr(date1.find(',') + 2));   //extract year
+            month1 = monthMap[monthStr1]; //convert month name to numeric value
 
-            // Split date2 into components
-            string monthStr2 = date2.substr(0, 3); // First 3 characters are the month
-            day2 = stoi(date2.substr(4, date2.find(',') - 4)); // Extract day
+            //split date2 into components
+            string monthStr2 = date2.substr(0, 3); //first 3 characters are the month
+            day2 = stoi(date2.substr(4, date2.find(',') - 4)); //extract day
             year2 = stoi(date2.substr(date2.find(',') + 2));   // Extract year
             month2 = monthMap[monthStr2]; // Convert month name to numeric value
         } catch (const invalid_argument& e) {
@@ -220,7 +220,7 @@ vector<Game> Hash::sortByReleaseDate() const {
             return false;
         }
 
-        // Compare year first, then month, then day
+        //compare year first, then month, then day
         if (year1 != year2) return year1 > year2;
         if (month1 != month2) return month1 > month2;
         return day1 > day2;
